@@ -37,11 +37,24 @@ interface EnvConfig {
  * Get required environment variable or throw error
  */
 function getEnvVar(key: string, defaultValue?: string): string {
-  const value = process.env[key] || defaultValue;
-  if (!value) {
+  // Check if the key exists in environment (even if empty string)
+  const exists = key in process.env;
+  const value = exists ? process.env[key] : defaultValue;
+  
+  // If no value and no default, throw error
+  if (value === undefined || value === null) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
+  
+  // Allow empty strings as valid values (for optional variables like callback URLs)
   return value;
+}
+
+/**
+ * Get optional environment variable (returns empty string if not set)
+ */
+function getOptionalEnvVar(key: string, defaultValue: string = ''): string {
+  return process.env[key] || defaultValue;
 }
 
 /**
@@ -65,8 +78,9 @@ export const env: EnvConfig = {
   MOMO_API_USER_ID: getEnvVar('MOMO_API_USER_ID'),
   MOMO_API_KEY: getEnvVar('MOMO_API_KEY'),
   MOMO_TARGET_ENVIRONMENT: getEnvVar('MOMO_TARGET_ENVIRONMENT', 'sandbox'),
-  MOMO_COLLECTION_CALLBACK_URL: getEnvVar('MOMO_COLLECTION_CALLBACK_URL', ''),
-  MOMO_DISBURSEMENT_CALLBACK_URL: getEnvVar('MOMO_DISBURSEMENT_CALLBACK_URL', ''),
+  // Callback URLs are optional - can be empty for testing without webhooks
+  MOMO_COLLECTION_CALLBACK_URL: getOptionalEnvVar('MOMO_COLLECTION_CALLBACK_URL', ''),
+  MOMO_DISBURSEMENT_CALLBACK_URL: getOptionalEnvVar('MOMO_DISBURSEMENT_CALLBACK_URL', ''),
 };
 
 /**
