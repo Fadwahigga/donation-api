@@ -89,3 +89,27 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response) =
   res.json(response);
 });
 
+/**
+ * Logout user
+ * POST /auth/logout
+ */
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({
+      success: false,
+      error: 'Unauthorized',
+    });
+    return;
+  }
+
+  // Log logout action
+  await authService.logout(req.user.userId);
+
+  const response: ApiResponse = {
+    success: true,
+    message: 'Logout successful. Please remove the token from client storage.',
+  };
+
+  res.json(response);
+});
+
