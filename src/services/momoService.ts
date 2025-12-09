@@ -33,7 +33,7 @@ class MoMoService {
       baseURL: `${env.MOMO_BASE_URL}/collection`,
       headers: {
         'Content-Type': 'application/json',
-        'Ocp-Apim-Subscription-Key': env.MOMO_SUBSCRIPTION_KEY,
+        'Ocp-Apim-Subscription-Key': env.MOMO_COLLECTION_SUBSCRIPTION_KEY,
       },
     });
 
@@ -42,7 +42,7 @@ class MoMoService {
       baseURL: `${env.MOMO_BASE_URL}/disbursement`,
       headers: {
         'Content-Type': 'application/json',
-        'Ocp-Apim-Subscription-Key': env.MOMO_SUBSCRIPTION_KEY,
+        'Ocp-Apim-Subscription-Key': env.MOMO_DISBURSEMENT_SUBSCRIPTION_KEY,
       },
     });
   }

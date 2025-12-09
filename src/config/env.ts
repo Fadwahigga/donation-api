@@ -25,7 +25,8 @@ interface EnvConfig {
   
   // MoMo API
   MOMO_BASE_URL: string;
-  MOMO_SUBSCRIPTION_KEY: string;
+  MOMO_COLLECTION_SUBSCRIPTION_KEY: string;
+  MOMO_DISBURSEMENT_SUBSCRIPTION_KEY: string;
   MOMO_API_USER_ID: string;
   MOMO_API_KEY: string;
   MOMO_TARGET_ENVIRONMENT: string;
@@ -74,7 +75,9 @@ export const env: EnvConfig = {
   
   // MoMo API configuration
   MOMO_BASE_URL: getEnvVar('MOMO_BASE_URL', 'https://sandbox.momodeveloper.mtn.com'),
-  MOMO_SUBSCRIPTION_KEY: getEnvVar('MOMO_SUBSCRIPTION_KEY'),
+  // Collection and Disbursement have separate subscription keys
+  MOMO_COLLECTION_SUBSCRIPTION_KEY: getEnvVar('MOMO_COLLECTION_SUBSCRIPTION_KEY'),
+  MOMO_DISBURSEMENT_SUBSCRIPTION_KEY: getEnvVar('MOMO_DISBURSEMENT_SUBSCRIPTION_KEY'),
   MOMO_API_USER_ID: getEnvVar('MOMO_API_USER_ID'),
   MOMO_API_KEY: getEnvVar('MOMO_API_KEY'),
   MOMO_TARGET_ENVIRONMENT: getEnvVar('MOMO_TARGET_ENVIRONMENT', 'sandbox'),
