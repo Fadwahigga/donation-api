@@ -46,6 +46,24 @@ export class ValidationError extends AppError {
 }
 
 /**
+ * Unauthorized Error (401)
+ */
+export class UnauthorizedError extends AppError {
+  constructor(message: string = 'Unauthorized') {
+    super(message, 401);
+  }
+}
+
+/**
+ * Forbidden Error (403)
+ */
+export class ForbiddenError extends AppError {
+  constructor(message: string = 'Forbidden') {
+    super(message, 403);
+  }
+}
+
+/**
  * Global error handler middleware
  */
 export function errorHandler(
