@@ -4,6 +4,7 @@ import causeRoutes from './causeRoutes';
 import donationRoutes from './donationRoutes';
 import payoutRoutes from './payoutRoutes';
 import webhookRoutes from './webhookRoutes';
+import { getSupportedCurrencies } from '../middleware/validators';
 
 /**
  * Main router - combines all route modules
@@ -17,6 +18,17 @@ router.get('/health', (_req, res) => {
     success: true,
     message: 'Donation API is running',
     timestamp: new Date().toISOString(),
+  });
+});
+
+// Get supported currencies endpoint
+router.get('/currencies', (_req, res) => {
+  res.json({
+    success: true,
+    data: {
+      currencies: getSupportedCurrencies(),
+      description: 'Supported MTN Mobile Money currencies',
+    },
   });
 });
 

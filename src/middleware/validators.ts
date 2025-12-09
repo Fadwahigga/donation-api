@@ -32,10 +32,46 @@ export function isValidAmount(amount: string | number): boolean {
 }
 
 /**
- * Validate currency code (3 letter ISO code)
+ * MTN Mobile Money supported currencies
+ * These are the currencies supported by MTN MoMo API across different countries
+ */
+const SUPPORTED_CURRENCIES = [
+  'XAF', // Central African CFA Franc (Cameroon, Chad, Central African Republic, etc.)
+  'XOF', // West African CFA Franc (Côte d'Ivoire, Senegal, etc.)
+  'UGX', // Ugandan Shilling
+  'GHS', // Ghanaian Cedi
+  'ZAR', // South African Rand
+  'NGN', // Nigerian Naira
+  'ZMW', // Zambian Kwacha
+  'RWF', // Rwandan Franc
+  'TZS', // Tanzanian Shilling
+  'KES', // Kenyan Shilling
+  'ETB', // Ethiopian Birr
+  'MWK', // Malawian Kwacha
+  'MZN', // Mozambican Metical
+  'USD', // US Dollar (if supported in your region)
+  'EUR', // Euro (if supported in your region)
+  'GBP', // British Pound (if supported in your region)
+];
+
+/**
+ * Validate currency code (must be a supported MTN MoMo currency)
  */
 export function isValidCurrency(currency: string): boolean {
-  return /^[A-Z]{3}$/i.test(currency);
+  if (!currency || typeof currency !== 'string') {
+    return false;
+  }
+  // Convert to uppercase for case-insensitive comparison
+  const upperCurrency = currency.toUpperCase().trim();
+  // Check if it's a valid 3-letter ISO code and in supported list
+  return /^[A-Z]{3}$/.test(upperCurrency) && SUPPORTED_CURRENCIES.includes(upperCurrency);
+}
+
+/**
+ * Get list of supported currencies
+ */
+export function getSupportedCurrencies(): string[] {
+  return [...SUPPORTED_CURRENCIES];
 }
 
 /**
@@ -65,7 +101,7 @@ export function validateDonationRequest(
   if (!currency) {
     errors.push('currency is required');
   } else if (!isValidCurrency(currency)) {
-    errors.push('currency must be a valid 3-letter ISO code');
+    errors.push(`currency must be a supported MTN MoMo currency. Supported currencies: ${getSupportedCurrencies().join(', ')}`);
   }
 
   if (!donorPhone) {
@@ -108,7 +144,7 @@ export function validatePayoutRequest(
   if (!currency) {
     errors.push('currency is required');
   } else if (!isValidCurrency(currency)) {
-    errors.push('currency must be a valid 3-letter ISO code');
+    errors.push(`currency must be a supported MTN MoMo currency. Supported currencies: ${getSupportedCurrencies().join(', ')}`);
   }
 
   if (errors.length > 0) {

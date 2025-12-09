@@ -48,6 +48,62 @@ Check if the API is running.
 
 ---
 
+## Supported Currencies
+
+### GET `/currencies`
+
+Get the list of supported MTN Mobile Money currencies.
+
+**Response**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "currencies": [
+      "XAF",
+      "XOF",
+      "UGX",
+      "GHS",
+      "ZAR",
+      "NGN",
+      "ZMW",
+      "RWF",
+      "TZS",
+      "KES",
+      "ETB",
+      "MWK",
+      "MZN",
+      "USD",
+      "EUR",
+      "GBP"
+    ],
+    "description": "Supported MTN Mobile Money currencies"
+  }
+}
+```
+
+**Supported Currencies**:
+- **XAF** - Central African CFA Franc (Cameroon, Chad, Central African Republic, etc.)
+- **XOF** - West African CFA Franc (Côte d'Ivoire, Senegal, etc.)
+- **UGX** - Ugandan Shilling
+- **GHS** - Ghanaian Cedi
+- **ZAR** - South African Rand
+- **NGN** - Nigerian Naira
+- **ZMW** - Zambian Kwacha
+- **RWF** - Rwandan Franc
+- **TZS** - Tanzanian Shilling
+- **KES** - Kenyan Shilling
+- **ETB** - Ethiopian Birr
+- **MWK** - Malawian Kwacha
+- **MZN** - Mozambican Metical
+- **USD** - US Dollar (if supported in your region)
+- **EUR** - Euro (if supported in your region)
+- **GBP** - British Pound (if supported in your region)
+
+**Note**: The currency you use must match the MTN MoMo service in your target country/region.
+
+---
+
 ## Authentication
 
 The API uses JWT (JSON Web Tokens) for authentication. Most endpoints are publicly accessible, but some may require authentication in the future.
@@ -404,9 +460,11 @@ Create a new donation and initiate MoMo payment request.
 **Fields**:
 - `causeId` (UUID, required): ID of the cause to donate to
 - `amount` (string or number, required): Donation amount
-- `currency` (string, required): Currency code (e.g., "XAF", "USD", "EUR")
+- `currency` (string, required): Currency code - must be a supported MTN MoMo currency. Use `GET /currencies` to see all supported currencies. Common examples: "XAF" (Cameroon), "UGX" (Uganda), "GHS" (Ghana), "ZAR" (South Africa)
 - `donorPhone` (string, required): Donor's phone number
 - `payerMessage` (string, optional): Message from the donor
+
+**Supported Currencies**: XAF, XOF, UGX, GHS, ZAR, NGN, ZMW, RWF, TZS, KES, ETB, MWK, MZN, USD, EUR, GBP
 
 **Response**: `201 Created`
 ```json
@@ -626,7 +684,9 @@ Create a payout and initiate MoMo transfer to cause owner.
 **Fields**:
 - `causeId` (UUID, required): ID of the cause
 - `amount` (string or number, required): Payout amount
-- `currency` (string, required): Currency code
+- `currency` (string, required): Currency code - must be a supported MTN MoMo currency and match the currency of donations for this cause. Use `GET /currencies` to see all supported currencies.
+
+**Supported Currencies**: XAF, XOF, UGX, GHS, ZAR, NGN, ZMW, RWF, TZS, KES, ETB, MWK, MZN, USD, EUR, GBP
 
 **Response**: `201 Created`
 ```json
