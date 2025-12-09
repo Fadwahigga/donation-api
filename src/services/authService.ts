@@ -167,3 +167,19 @@ export async function getUserById(userId: string): Promise<Omit<User, 'password'
   return user;
 }
 
+/**
+ * Logout user
+ * Note: With JWT, logout is primarily client-side (remove token).
+ * This endpoint validates the token and logs the logout action.
+ */
+export async function logout(userId: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
+
+  if (user) {
+    logger.info('User logged out:', { email: user.email, id: userId });
+  }
+}
+
