@@ -1,7 +1,10 @@
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config();
+// Load environment variables from .env file (only in development)
+// In production (Railway), use environment variables directly
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 /**
  * Environment configuration
