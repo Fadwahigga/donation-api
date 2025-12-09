@@ -16,6 +16,10 @@ interface EnvConfig {
   // Database
   DATABASE_URL: string;
   
+  // Authentication
+  JWT_SECRET: string;
+  JWT_EXPIRES_IN: string;
+  
   // MoMo API
   MOMO_BASE_URL: string;
   MOMO_SUBSCRIPTION_KEY: string;
@@ -47,6 +51,10 @@ export const env: EnvConfig = {
   
   // Database
   DATABASE_URL: getEnvVar('DATABASE_URL'),
+  
+  // Authentication
+  JWT_SECRET: getEnvVar('JWT_SECRET', 'your-secret-key-change-in-production'),
+  JWT_EXPIRES_IN: getEnvVar('JWT_EXPIRES_IN', '7d'),
   
   // MoMo API configuration
   MOMO_BASE_URL: getEnvVar('MOMO_BASE_URL', 'https://sandbox.momodeveloper.mtn.com'),
