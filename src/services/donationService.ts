@@ -95,6 +95,17 @@ export async function getDonationByExternalId(
 }
 
 /**
+ * Get donation by MoMo reference ID
+ */
+export async function getDonationByMomoRefId(
+  momoRefId: string
+): Promise<Donation | null> {
+  return prisma.donation.findFirst({
+    where: { momoRefId },
+  });
+}
+
+/**
  * Get all donations for a cause
  */
 export async function getDonationsByCause(causeId: string): Promise<Donation[]> {

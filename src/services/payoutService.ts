@@ -155,6 +155,17 @@ export async function getPayoutById(id: string): Promise<Payout | null> {
 }
 
 /**
+ * Get payout by MoMo reference ID
+ */
+export async function getPayoutByMomoRefId(
+  momoRefId: string
+): Promise<Payout | null> {
+  return prisma.payout.findFirst({
+    where: { momoRefId },
+  });
+}
+
+/**
  * Get all payouts for a cause
  */
 export async function getPayoutsByCause(causeId: string): Promise<Payout[]> {

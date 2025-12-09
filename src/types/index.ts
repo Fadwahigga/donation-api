@@ -135,3 +135,20 @@ export interface PaymentStatusResult {
   error?: string;
 }
 
+/**
+ * MoMo webhook callback payload
+ * This is what MoMo sends to our callback URL
+ */
+export interface MoMoWebhookCallback {
+  referenceId: string;
+  status: 'SUCCESSFUL' | 'FAILED' | 'PENDING';
+  amount?: string;
+  currency?: string;
+  financialTransactionId?: string;
+  externalId?: string;
+  reason?: {
+    code: string;
+    message: string;
+  };
+}
+
