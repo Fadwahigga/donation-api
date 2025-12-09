@@ -21,6 +21,14 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fadwahigga/donation-api.git"
+  },
+  "homepage": "https://github.com/Fadwahigga/donation-api#readme",
+  "bugs": {
+    "url": "https://github.com/Fadwahigga/donation-api/issues"
+  },
   "dependencies": {
     "@prisma/client": "^5.7.0",
     "axios": "^1.6.2",
