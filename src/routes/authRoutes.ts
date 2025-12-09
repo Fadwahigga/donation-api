@@ -15,6 +15,9 @@ router.post('/register', validateRegisterRequest, authController.register);
 // POST /auth/login - Login user
 router.post('/login', validateLoginRequest, authController.login);
 
+// POST /auth/logout - Logout user (protected)
+router.post('/logout', authenticate, authController.logout);
+
 // GET /auth/me - Get current user profile (protected)
 router.get('/me', authenticate, authController.getCurrentUser);
 
