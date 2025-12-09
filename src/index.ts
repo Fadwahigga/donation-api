@@ -77,8 +77,8 @@ async function startServer(): Promise<void> {
     // Connect to database
     await connectDatabase();
 
-    // Start Express server
-    app.listen(env.PORT, () => {
+    // Start Express server - bind to 0.0.0.0 for Railway/container environments
+    app.listen(env.PORT, '0.0.0.0', () => {
       logger.info(`🚀 Server running on port ${env.PORT}`);
       logger.info(`📍 Environment: ${env.NODE_ENV}`);
       logger.info(`📡 API Base URL: http://localhost:${env.PORT}/api/v1`);
