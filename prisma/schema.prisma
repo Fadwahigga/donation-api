@@ -10,20 +10,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model - represents an authenticated user
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // hashed password
+  name      String?
+  phone     String?
+  role      String   @default("user") // user, admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  causes Cause[]
+
+  @@index([email])
+}
+
 // Cause model - represents a donation cause or creator
 model Cause {
   id          String   @id @default(uuid())
   name        String
   description String?  @db.Text
   ownerPhone  String   // phone or identifier of cause owner/beneficiary
+  userId      String?  // Optional: link to authenticated user
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   donations Donation[]
   payouts   Payout[]
 
   @@index([ownerPhone])
+  @@index([userId])
 }
 
 // Donation model - represents a donation made to a cause
