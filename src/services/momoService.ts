@@ -147,16 +147,23 @@ class MoMoService {
         externalId: payload.externalId,
       });
 
+      // Build headers with conditional callback URL
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+        'X-Reference-Id': referenceId,
+        'X-Target-Environment': env.MOMO_TARGET_ENVIRONMENT,
+      };
+
+      // Only include callback URL if it's configured and not empty
+      if (env.MOMO_COLLECTION_CALLBACK_URL && env.MOMO_COLLECTION_CALLBACK_URL.trim() !== '') {
+        headers['X-Callback-Url'] = env.MOMO_COLLECTION_CALLBACK_URL.trim();
+      }
+
       await this.collectionClient.post(
         '/v1_0/requesttopay',
         payload,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'X-Reference-Id': referenceId,
-            'X-Target-Environment': env.MOMO_TARGET_ENVIRONMENT,
-            'X-Callback-Url': env.MOMO_COLLECTION_CALLBACK_URL || undefined,
-          },
+          headers,
         }
       );
 
@@ -252,16 +259,23 @@ class MoMoService {
         externalId: payload.externalId,
       });
 
+      // Build headers with conditional callback URL
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+        'X-Reference-Id': referenceId,
+        'X-Target-Environment': env.MOMO_TARGET_ENVIRONMENT,
+      };
+
+      // Only include callback URL if it's configured and not empty
+      if (env.MOMO_DISBURSEMENT_CALLBACK_URL && env.MOMO_DISBURSEMENT_CALLBACK_URL.trim() !== '') {
+        headers['X-Callback-Url'] = env.MOMO_DISBURSEMENT_CALLBACK_URL.trim();
+      }
+
       await this.disbursementClient.post(
         '/v1_0/transfer',
         payload,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'X-Reference-Id': referenceId,
-            'X-Target-Environment': env.MOMO_TARGET_ENVIRONMENT,
-            'X-Callback-Url': env.MOMO_DISBURSEMENT_CALLBACK_URL || undefined,
-          },
+          headers,
         }
       );
 
