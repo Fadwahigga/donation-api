@@ -100,7 +100,12 @@ Get the list of supported MTN Mobile Money currencies.
 - **EUR** - Euro (if supported in your region)
 - **GBP** - British Pound (if supported in your region)
 
-**Note**: The currency you use must match the MTN MoMo service in your target country/region.
+**Important Notes**:
+- **Sandbox Environment**: The MTN MoMo sandbox environment **ONLY supports EUR (Euro)** currency. Use `"EUR"` for all sandbox testing.
+- **Production Environment**: In production, the currency must match the MTN MoMo service in your target country/region (e.g., XAF for Cameroon, UGX for Uganda, etc.).
+- **Currency Mismatch Error**: If you receive "Currency not supported" error, ensure you're using the correct currency for your environment:
+  - **Sandbox**: Always use `"EUR"`
+  - **Production**: Use the currency code for your specific country (XAF, UGX, GHS, etc.)
 
 ---
 
@@ -460,11 +465,15 @@ Create a new donation and initiate MoMo payment request.
 **Fields**:
 - `causeId` (UUID, required): ID of the cause to donate to
 - `amount` (string or number, required): Donation amount
-- `currency` (string, required): Currency code - must be a supported MTN MoMo currency. Use `GET /currencies` to see all supported currencies. Common examples: "XAF" (Cameroon), "UGX" (Uganda), "GHS" (Ghana), "ZAR" (South Africa)
-- `donorPhone` (string, required): Donor's phone number
+- `currency` (string, required): Currency code - **IMPORTANT**: 
+  - **Sandbox**: Must use `"EUR"` (sandbox only supports EUR)
+  - **Production**: Use country-specific currency (e.g., "XAF" for Cameroon, "UGX" for Uganda, "GHS" for Ghana)
+- `donorPhone` (string, required): Donor's phone number (use test numbers in sandbox: `+237670000001`, `+237670000002`, etc.)
 - `payerMessage` (string, optional): Message from the donor
 
-**Supported Currencies**: XAF, XOF, UGX, GHS, ZAR, NGN, ZMW, RWF, TZS, KES, ETB, MWK, MZN, USD, EUR, GBP
+**Supported Currencies (Production)**: XAF, XOF, UGX, GHS, ZAR, NGN, ZMW, RWF, TZS, KES, ETB, MWK, MZN, USD, EUR, GBP
+
+**Sandbox Currency**: EUR only
 
 **Response**: `201 Created`
 ```json
@@ -684,9 +693,13 @@ Create a payout and initiate MoMo transfer to cause owner.
 **Fields**:
 - `causeId` (UUID, required): ID of the cause
 - `amount` (string or number, required): Payout amount
-- `currency` (string, required): Currency code - must be a supported MTN MoMo currency and match the currency of donations for this cause. Use `GET /currencies` to see all supported currencies.
+- `currency` (string, required): Currency code - **IMPORTANT**:
+  - **Sandbox**: Must use `"EUR"` (sandbox only supports EUR)
+  - **Production**: Must match the currency of donations for this cause (e.g., "XAF" for Cameroon causes)
 
-**Supported Currencies**: XAF, XOF, UGX, GHS, ZAR, NGN, ZMW, RWF, TZS, KES, ETB, MWK, MZN, USD, EUR, GBP
+**Supported Currencies (Production)**: XAF, XOF, UGX, GHS, ZAR, NGN, ZMW, RWF, TZS, KES, ETB, MWK, MZN, USD, EUR, GBP
+
+**Sandbox Currency**: EUR only
 
 **Response**: `201 Created`
 ```json
@@ -963,6 +976,23 @@ MTN provides a sandbox environment for testing. Use these test phone numbers:
 - `+237670000003` - Pending scenario
 - `+237670000004` - Failed scenario
 
+**⚠️ CRITICAL: Sandbox Currency Limitation**
+- The MTN MoMo **sandbox environment ONLY supports EUR (Euro)** currency
+- **Always use `"EUR"` for all sandbox testing**, regardless of your production target country
+- Using any other currency (XAF, UGX, etc.) in sandbox will result in "Currency not supported" error
+- In production, you can use country-specific currencies (XAF for Cameroon, UGX for Uganda, etc.)
+
+**Example Sandbox Donation Request**:
+```json
+{
+  "causeId": "872f5d8f-03b7-4b3e-9486-19ac9f87e197",
+  "amount": "500",
+  "currency": "EUR",  // ← Must be EUR in sandbox!
+  "donorPhone": "+237670000001",
+  "payerMessage": "Test donation"
+}
+```
+
 ### Webhook Configuration
 
 Webhooks require publicly accessible HTTPS URLs. For local development:
@@ -1140,13 +1170,13 @@ const response = await fetch('https://your-app.railway.app/api/v1/donate', {
   headers: {
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({
-    causeId: '550e8400-e29b-41d4-a716-446655440000',
-    amount: '1000',
-    currency: 'XAF',
-    donorPhone: '+237670000002',
-    payerMessage: 'Happy to help!'
-  })
+    body: JSON.stringify({
+      causeId: '550e8400-e29b-41d4-a716-446655440000',
+      amount: '1000',
+      currency: 'EUR',  // Use EUR for sandbox, XAF for production (Cameroon)
+      donorPhone: '+237670000002',
+      payerMessage: 'Happy to help!'
+    })
 });
 
 const result = await response.json();
@@ -1190,7 +1220,7 @@ async function createDonation(causeId, amount, donorPhone) {
     body: JSON.stringify({
       causeId,
       amount,
-      currency: 'XAF',
+      currency: 'EUR',  // Use EUR for sandbox, XAF for production (Cameroon)
       donorPhone,
       payerMessage: 'Supporting a good cause'
     })
@@ -1244,6 +1274,7 @@ async function createDonation(causeId, amount, donorPhone) {
 11. **MoMo Testing**: 
     - Use sandbox environment for testing
     - Test phone numbers: `+237670000001` through `+237670000004`
+    - **IMPORTANT**: Sandbox ONLY supports `"EUR"` currency - use EUR for all sandbox tests
     - No real money involved in sandbox
 
 12. **Webhooks**: 

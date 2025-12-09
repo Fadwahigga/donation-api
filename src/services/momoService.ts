@@ -171,7 +171,20 @@ class MoMoService {
       logger.error('RequestToPay failed:', {
         referenceId,
         status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        headers: axiosError.response?.headers,
         data: axiosError.response?.data,
+        payload: {
+          amount: payload.amount,
+          currency: payload.currency,
+          externalId: payload.externalId,
+          payerPartyId: payload.payer.partyId,
+        },
+        config: {
+          url: axiosError.config?.url,
+          method: axiosError.config?.method,
+          baseURL: axiosError.config?.baseURL,
+        },
       });
 
       return {
@@ -351,8 +364,45 @@ class MoMoService {
    */
   private extractErrorMessage(error: AxiosError): string {
     if (error.response?.data) {
-      const data = error.response.data as { message?: string; reason?: string };
-      return data.message || data.reason || 'Unknown error from MoMo API';
+      const data = error.response.data as any;
+      
+      // Log full error response for debugging
+      logger.error('MoMo API Error Response:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: JSON.stringify(data),
+      });
+      
+      // Try to extract meaningful error message
+      if (typeof data === 'string') {
+        return data;
+      }
+      
+      if (data.message) {
+        return data.message;
+      }
+      
+      if (data.reason) {
+        return data.reason;
+      }
+      
+      if (data.error) {
+        return typeof data.error === 'string' 
+          ? data.error 
+          : data.error.message || data.error.reason || 'Unknown error from MoMo API';
+      }
+      
+      if (data.code) {
+        return `MoMo API Error: ${data.code}${data.message ? ` - ${data.message}` : ''}`;
+      }
+      
+      // If it's an array of errors
+      if (Array.isArray(data)) {
+        return data.map((err: any) => err.message || err).join(', ');
+      }
+      
+      // Return stringified data as fallback
+      return JSON.stringify(data);
     }
     return error.message || 'Unknown error';
   }
