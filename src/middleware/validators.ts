@@ -177,3 +177,75 @@ export function validatePhoneParam(paramName: string) {
   };
 }
 
+/**
+ * Validate email format
+ */
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Middleware: Validate register request body
+ */
+export function validateRegisterRequest(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  const { email, password, name, phone } = req.body;
+
+  const errors: string[] = [];
+
+  if (!email) {
+    errors.push('email is required');
+  } else if (!isValidEmail(email)) {
+    errors.push('email must be a valid email address');
+  }
+
+  if (!password) {
+    errors.push('password is required');
+  } else if (password.length < 6) {
+    errors.push('password must be at least 6 characters long');
+  }
+
+  if (phone && !isValidPhone(phone)) {
+    errors.push('phone must be a valid phone number');
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors.join(', '));
+  }
+
+  next();
+}
+
+/**
+ * Middleware: Validate login request body
+ */
+export function validateLoginRequest(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  const { email, password } = req.body;
+
+  const errors: string[] = [];
+
+  if (!email) {
+    errors.push('email is required');
+  } else if (!isValidEmail(email)) {
+    errors.push('email must be a valid email address');
+  }
+
+  if (!password) {
+    errors.push('password is required');
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors.join(', '));
+  }
+
+  next();
+}
+
