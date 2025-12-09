@@ -150,7 +150,38 @@ Login and get JWT token.
 
 ---
 
-### 3. Get Current User
+### 3. Logout
+
+**POST** `/auth/logout`
+
+Logout the current user. This endpoint validates the token and logs the logout action.
+
+**Note**: With JWT authentication, logout is primarily handled client-side by removing the token from storage. This endpoint serves as a confirmation that the logout was successful.
+
+**Headers**:
+```
+Authorization: Bearer <jwt-token>
+```
+
+**Response**: `200 OK`
+```json
+{
+  "success": true,
+  "message": "Logout successful. Please remove the token from client storage."
+}
+```
+
+**Error Response**: `401 Unauthorized`
+```json
+{
+  "success": false,
+  "error": "Unauthorized"
+}
+```
+
+---
+
+### 4. Get Current User
 
 **GET** `/auth/me`
 
@@ -996,6 +1027,26 @@ const loginResponse = await fetch('https://your-app.railway.app/api/v1/auth/logi
 const loginResult = await loginResponse.json();
 if (loginResult.success) {
   localStorage.setItem('token', loginResult.data.token);
+}
+```
+
+### Logout
+```javascript
+// Logout user
+const token = localStorage.getItem('token');
+const logoutResponse = await fetch('https://your-app.railway.app/api/v1/auth/logout', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});
+
+const logoutResult = await logoutResponse.json();
+if (logoutResult.success) {
+  // Remove token from client storage
+  localStorage.removeItem('token');
+  // Redirect to login page or update UI
+  console.log('Logged out successfully');
 }
 ```
 
