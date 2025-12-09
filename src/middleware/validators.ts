@@ -1,0 +1,179 @@
+import { Request, Response, NextFunction } from 'express';
+import { ValidationError, BadRequestError } from './errorHandler';
+
+/**
+ * Input validation middleware
+ */
+
+/**
+ * Validate phone number format
+ * Accepts international format with + prefix or numbers only
+ */
+export function isValidPhone(phone: string): boolean {
+  // Basic validation: allows digits, optional + prefix, min 8 chars
+  const phoneRegex = /^\+?[0-9]{8,15}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ''));
+}
+
+/**
+ * Validate UUID format
+ */
+export function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+/**
+ * Validate amount (positive number)
+ */
+export function isValidAmount(amount: string | number): boolean {
+  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  return !isNaN(numAmount) && numAmount > 0;
+}
+
+/**
+ * Validate currency code (3 letter ISO code)
+ */
+export function isValidCurrency(currency: string): boolean {
+  return /^[A-Z]{3}$/i.test(currency);
+}
+
+/**
+ * Middleware: Validate donation request body
+ */
+export function validateDonationRequest(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  const { causeId, amount, currency, donorPhone } = req.body;
+
+  const errors: string[] = [];
+
+  if (!causeId) {
+    errors.push('causeId is required');
+  } else if (!isValidUUID(causeId)) {
+    errors.push('causeId must be a valid UUID');
+  }
+
+  if (amount === undefined || amount === null || amount === '') {
+    errors.push('amount is required');
+  } else if (!isValidAmount(amount)) {
+    errors.push('amount must be a positive number');
+  }
+
+  if (!currency) {
+    errors.push('currency is required');
+  } else if (!isValidCurrency(currency)) {
+    errors.push('currency must be a valid 3-letter ISO code');
+  }
+
+  if (!donorPhone) {
+    errors.push('donorPhone is required');
+  } else if (!isValidPhone(donorPhone)) {
+    errors.push('donorPhone must be a valid phone number');
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors.join(', '));
+  }
+
+  next();
+}
+
+/**
+ * Middleware: Validate payout request body
+ */
+export function validatePayoutRequest(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  const { causeId, amount, currency } = req.body;
+
+  const errors: string[] = [];
+
+  if (!causeId) {
+    errors.push('causeId is required');
+  } else if (!isValidUUID(causeId)) {
+    errors.push('causeId must be a valid UUID');
+  }
+
+  if (amount === undefined || amount === null || amount === '') {
+    errors.push('amount is required');
+  } else if (!isValidAmount(amount)) {
+    errors.push('amount must be a positive number');
+  }
+
+  if (!currency) {
+    errors.push('currency is required');
+  } else if (!isValidCurrency(currency)) {
+    errors.push('currency must be a valid 3-letter ISO code');
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors.join(', '));
+  }
+
+  next();
+}
+
+/**
+ * Middleware: Validate cause request body
+ */
+export function validateCauseRequest(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  const { name, ownerPhone } = req.body;
+
+  const errors: string[] = [];
+
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    errors.push('name is required and must be a non-empty string');
+  }
+
+  if (!ownerPhone) {
+    errors.push('ownerPhone is required');
+  } else if (!isValidPhone(ownerPhone)) {
+    errors.push('ownerPhone must be a valid phone number');
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError(errors.join(', '));
+  }
+
+  next();
+}
+
+/**
+ * Middleware: Validate UUID parameter
+ */
+export function validateUUIDParam(paramName: string) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const param = req.params[paramName];
+
+    if (!param || !isValidUUID(param)) {
+      throw new BadRequestError(`${paramName} must be a valid UUID`);
+    }
+
+    next();
+  };
+}
+
+/**
+ * Middleware: Validate phone parameter
+ */
+export function validatePhoneParam(paramName: string) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const param = req.params[paramName];
+
+    if (!param || !isValidPhone(param)) {
+      throw new BadRequestError(`${paramName} must be a valid phone number`);
+    }
+
+    next();
+  };
+}
+

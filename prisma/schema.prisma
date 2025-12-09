@@ -1,0 +1,72 @@
+// Prisma schema for Donation / Micro-Payments application
+// Uses MySQL as the database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Cause model - represents a donation cause or creator
+model Cause {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  ownerPhone  String   // phone or identifier of cause owner/beneficiary
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  donations Donation[]
+  payouts   Payout[]
+
+  @@index([ownerPhone])
+}
+
+// Donation model - represents a donation made to a cause
+model Donation {
+  id           String   @id @default(uuid())
+  causeId      String
+  donorPhone   String
+  amount       Decimal  @db.Decimal(15, 2) // High precision for monetary values
+  currency     String   @db.VarChar(3) // ISO currency code (e.g., EUR, USD, XOF)
+  status       String   @default("pending") // pending, success, failed
+  externalId   String   @unique // Internal reference for this donation (UUID)
+  momoRefId    String?  // Reference from MoMo API (payment request or confirmation)
+  payerMessage String?  @db.Text // Message from donor
+  payeeNote    String?  @db.Text // Note for beneficiary
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  cause Cause @relation(fields: [causeId], references: [id], onDelete: Cascade)
+
+  @@index([causeId])
+  @@index([donorPhone])
+  @@index([status])
+  @@index([externalId])
+}
+
+// Payout model - represents disbursement of funds to cause owner
+model Payout {
+  id         String   @id @default(uuid())
+  causeId    String
+  amount     Decimal  @db.Decimal(15, 2)
+  currency   String   @db.VarChar(3)
+  status     String   @default("pending") // pending, completed, failed
+  externalId String   @unique // Internal reference
+  momoRefId  String?  // MoMo transfer reference
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  cause Cause @relation(fields: [causeId], references: [id], onDelete: Cascade)
+
+  @@index([causeId])
+  @@index([status])
+  @@index([externalId])
+}
+
